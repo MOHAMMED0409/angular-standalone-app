@@ -1,0 +1,7 @@
+{
+  "components": {
+    "dashboard": "v1.0.0",
+    "reports": "v1.0.0",
+    "settings": "v1.0.0"
+  }
+}
