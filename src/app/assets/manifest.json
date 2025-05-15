@@ -1,6 +1,6 @@
 {
   "components": {
-    "dashboard": "v1.0.0",
+    "dashboard": "v1.0.1",
     "reports": "v1.0.0",
     "settings": "v1.0.0"
   }
