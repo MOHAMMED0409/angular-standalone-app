@@ -1,0 +1,67 @@
+version: 2
+plan:
+  project-key: ANG
+  key: ANGULAR
+  name: Angular Standalone App
+
+  repository:
+    name: angular-repo
+    type: git
+    url: ssh://git@your-repo-url.git
+    branch: main
+
+  stages:
+  - Build
+  - Deploy
+
+  jobs:
+  - build:
+      key: BUILD
+      tasks:
+      - checkout: angular-repo
+
+      - script:
+          interpreter: BINSH_OR_CMDEXE
+          scripts:
+          - |
+            echo "Setting up Node 18"
+            . ~/.nvm/nvm.sh
+            nvm install 18
+            nvm use 18
+            node -v
+            npm -v
+
+      - script:
+          description: Install dependencies
+          scripts:
+          - npm ci
+
+      - script:
+          description: Build Angular app
+          scripts:
+          - npm run build
+
+  - deploy:
+      key: DEPLOY
+      tasks:
+      - script:
+          description: Deploy based on manifest
+          scripts:
+          - |
+            apt-get update && apt-get install -y jq
+            MANIFEST=manifest/manifest.json
+            DEPLOY_TARGET=/var/www/html
+
+            COMPONENTS=$(jq -r 'keys[]' $MANIFEST)
+            for COMPONENT in $COMPONENTS; do
+              VERSION=$(jq -r ".\"$COMPONENT\"" $MANIFEST)
+              SOURCE_DIR="dist/angular-standalone-app/browser/${COMPONENT}-${VERSION}"
+
+              if [ -d "$SOURCE_DIR" ]; then
+                echo "Deploying $COMPONENT version $VERSION..."
+                mkdir -p $DEPLOY_TARGET/$COMPONENT
+                cp -r $SOURCE_DIR/* $DEPLOY_TARGET/$COMPONENT/
+              else
+                echo "Component $COMPONENT not found."
+              fi
+            done
