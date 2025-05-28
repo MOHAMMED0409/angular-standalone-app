@@ -2,7 +2,7 @@
 ## Angular Deployment Pipeline – Bamboo CI/CD Documentation
 
 ### Project Overview
-This document outlines the setup and execution of a CI/CD pipeline using **Atlassian Bamboo** to build and deploy an Angular application to a **local Apache web server** hosted at `172.18.0.1`.
+This document outlines the setup and execution of a CI/CD pipeline using **Atlassian Bamboo** to build and deploy an Angular application to a **local Apache web server** hosted at `127.0.0.1`.
 
 ---
 
@@ -11,7 +11,7 @@ This document outlines the setup and execution of a CI/CD pipeline using **Atlas
 - **CI Tool**: Bamboo
 - **Web Server**: Apache (local)
 - **Deployment Target**: `/var/www/html`
-- **User**: `mkhashif`
+- **User**: `your_username`
 - **Build Output**: `dist/angular-standalone-app/`
 
 ---
@@ -87,8 +87,7 @@ Under **Artifacts**, define:
 set -e
 
 echo "===== Deploy Script Started ====="
-
-BUILD_DIR="/home/mkhashif/bamboo-agent-home/xml-data/build-dir/PROJECTKEY-JOBKEY/dist/angular-standalone-app"
+BUILD_DIR="/home/your_username/bamboo-agent-home/xml-data/build-dir/PROJECTKEY-JOBKEY/dist/angular-standalone-app"
 
 # Validate build dir
 if [ ! -d "$BUILD_DIR" ]; then
@@ -97,10 +96,10 @@ if [ ! -d "$BUILD_DIR" ]; then
 fi
 
 echo "Copying files..."
-scp -r "$BUILD_DIR"/* mkhashif@172.18.0.1:/var/www/html
+scp -r "$BUILD_DIR"/* your_username@127.0.0.1:/var/www/html
 
 echo "Files copied. Verifying..."
-ssh mkhashif@172.18.0.1 "ls -l /var/www/html"
+ssh your_username@127.0.0.1 "ls -l /var/www/html"
 
 echo "===== Deploy Script Finished ====="
 ```
@@ -112,7 +111,7 @@ echo "===== Deploy Script Finished ====="
 On **Bamboo Agent**:
 ```bash
 ssh-keygen -t rsa -b 2048 -N "" -f ~/.ssh/id_rsa
-ssh-copy-id mkhashif@172.18.0.1
+ssh-copy-id your_username@127.0.0.1
 ```
 
 ---
@@ -124,20 +123,20 @@ ssh-copy-id mkhashif@172.18.0.1
 | `Node packages may not be installed` | `node_modules/` missing | Add `npm install` task |
 | `Could not find '@angular-devkit'` | Missing build packages | Ensure `@angular-devkit/build-angular` is installed |
 | `Failing as no matching files found` | Artifact path wrong | Double-check `dist/` path in Artifact settings |
-| `scp: Permission denied` | No write access to `/var/www/html` | Run: `sudo chown -R mkhashif:mkhashif /var/www/html` on the server |
-| `ssh: Permission denied (publickey)` | SSH key not copied | Run `ssh-copy-id mkhashif@172.18.0.1` |
+| `scp: Permission denied` | No write access to `/var/www/html` | Run: `sudo chown -R your_username:your_username /var/www/html` on the server |
+| `ssh: Permission denied (publickey)` | SSH key not copied | Run `ssh-copy-id your_username@127.0.0.1` |
 
 ---
 
 ### Accessing the App
 If the Angular app was deployed to `/var/www/html`, access it via:
 ```url
-http://172.18.0.1/
+http://127.0.0.1/
 ```
 
 If deployed under a subfolder (like `browser/`):
 ```url
-http://172.18.0.1/browser/
+http://127.0.0.1/browser/
 ```
 
 ---
